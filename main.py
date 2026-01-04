@@ -121,6 +121,7 @@ class Game:
         self.draw_text("Arrows to move, Space to jump", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 2 / 3)
         self.draw_text("Press a key to play", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
         self.draw_text("Press Q to Quit", 18, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8)
+        self.draw_text(VERSION, 12, WHITE, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, align="bottomright")
         pygame.display.flip()
         self.wait_for_key()
 
@@ -164,13 +165,13 @@ class Game:
                     else:
                         waiting = False
 
-    def draw_text(self, text, size, color, x, y):
+    def draw_text(self, text, size, color, x, y, align="midtop"):
         """Helper to draw text on the screen."""
         font_name = pygame.font.match_font(FONT_NAME)
         font = pygame.font.Font(font_name, size)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
-        text_rect.midtop = (x, y)
+        setattr(text_rect, align, (x, y))
         self.screen.blit(text_surface, text_rect)
 
 g = Game()
