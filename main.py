@@ -25,7 +25,7 @@ class Game:
         # Create some platforms
         p1 = Platform(0, SCREEN_HEIGHT - 40, SCREEN_WIDTH, 40) # Floor
         p2 = Platform(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT * 3 / 4, 100, 20)
-        p3 = Platform(125, SCREEN_HEIGHT - 350, 100, 20)
+        p3 = Platform(125, SCREEN_HEIGHT - 350, 100, 20, moving=True)
         p4 = Platform(350, 200, 100, 20)
         
         self.platforms.add(p1, p2, p3, p4)

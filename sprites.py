@@ -64,10 +64,31 @@ class Platform(pygame.sprite.Sprite):
     """
     Represents static level geometry that the player can stand on.
     """
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, moving=False):
         super().__init__()
         self.image = pygame.Surface((w, h))
         self.image.fill(GREEN) # Green for platforms
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        
+        self.moving = moving
+        if self.moving:
+            self.start_x = x
+            # Distance to travel is equal to width. 
+            # Speed = Distance / Time (in frames approx, or pixels per update)
+            # Duration is in ms. Updates per second is FPS.
+            # Total frames = (Duration / 1000) * FPS
+            # Speed = Width / Total frames
+            total_frames = (PLATFORM_MOVE_DURATION / 1000) * FPS
+            self.velocity = w / total_frames
+            
+    def update(self):
+        if self.moving:
+            self.rect.x += self.velocity
+            
+            # Check bounds (move right by width, so range is [start_x, start_x + width])
+            if self.rect.x > self.start_x + self.rect.width:
+                self.velocity = -abs(self.velocity)
+            if self.rect.x < self.start_x:
+                self.velocity = abs(self.velocity)

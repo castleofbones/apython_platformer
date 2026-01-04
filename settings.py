@@ -6,6 +6,7 @@ FPS = 60
 FONT_NAME = 'Cascadia Code'
 SCREEN_DELAY = 2000
 VERSION = "v0.1.0"
+PLATFORM_MOVE_DURATION = 1000
 
 # Player Properties
 PLAYER_ACC = 0.5        # Horizontal acceleration
