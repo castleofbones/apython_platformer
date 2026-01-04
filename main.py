@@ -112,7 +112,7 @@ class Game:
             pygame.display.flip()
             
             # Wait for 3 seconds
-            self.wait_for_duration(3000)
+            self.wait_for_duration(SCREEN_DELAY)
 
         except pygame.error:
             # Fallback if image fails
@@ -134,7 +134,7 @@ class Game:
         pygame.display.flip()
         
         # Wait 3 seconds before accepting input
-        self.wait_for_duration(3000)
+        self.wait_for_duration(SCREEN_DELAY)
 
         self.wait_for_key()
 
