@@ -130,8 +130,17 @@ class Game:
         pygame.display.flip()
         
         # Wait 3 seconds before accepting input
+        self.wait_for_duration(3000)
+
+        self.wait_for_key()
+
+    def wait_for_duration(self, duration):
+        """
+        Wait for a specified duration in milliseconds.
+        Handles quit events during the wait.
+        """
         start_wait = pygame.time.get_ticks()
-        while pygame.time.get_ticks() - start_wait < 3000:
+        while pygame.time.get_ticks() - start_wait < duration:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -140,8 +149,6 @@ class Game:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     self.running = False
                     return
-
-        self.wait_for_key()
 
     def wait_for_key(self):
         """Wait for the user to press any key."""
