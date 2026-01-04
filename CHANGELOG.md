@@ -20,3 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Project structure (venv, requirements.txt).
     - Git repository initialization.
     - GitHub Actions (planned/setup).
+- **UI**: Added Start Screen and Game Over Screen.
+
+### Changed
+- **Refactor**: Moved game constants and configuration to `settings.py`.
+- **Dependencies**: Updated `pygame` to version 2.6.1 for Python 3.13 compatibility.
+- **sw**: Added docstrings and comments to `main.py` and `sprites.py`.
