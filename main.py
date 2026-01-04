@@ -109,6 +109,10 @@ class Game:
 
             # Keep the fully visible logo
             self.screen.blit(logo_img, logo_rect)
+            pygame.display.flip()
+            
+            # Wait for 3 seconds
+            self.wait_for_duration(3000)
 
         except pygame.error:
             # Fallback if image fails
@@ -126,7 +130,7 @@ class Game:
             return
         self.screen.fill(BLACK)
         self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
-        self.draw_text("Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+        self.draw_text("Press a key to play again or Q to quit", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
         pygame.display.flip()
         
         # Wait 3 seconds before accepting input
