@@ -85,6 +85,7 @@ class Game:
         try:
             # Load and scale logo
             logo_img = pygame.image.load('logo.png')
+            # detailed logo might need scaling, let's keep it reasonable width
             logo_img = pygame.transform.scale(logo_img, (400, 300))
             logo_rect = logo_img.get_rect()
             logo_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
@@ -127,6 +128,19 @@ class Game:
         self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
         self.draw_text("Press a key to play again", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
         pygame.display.flip()
+        
+        # Wait 3 seconds before accepting input
+        start_wait = pygame.time.get_ticks()
+        while pygame.time.get_ticks() - start_wait < 3000:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    return
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    self.running = False
+                    return
+
         self.wait_for_key()
 
     def wait_for_key(self):
