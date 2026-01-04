@@ -1,0 +1,17 @@
+# Game Options / Settings
+SCREEN_TITLE = "Platformer"
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+FPS = 60
+
+# Player Properties
+PLAYER_ACC = 0.5        # Horizontal acceleration
+PLAYER_FRICTION = -0.12 # Friction (negative to oppose movement)
+PLAYER_GRAVITY = 0.8    # Vertical acceleration (gravity)
+PLAYER_JUMP = 20        # Initial upward velocity for jumping
+
+# Colors (R, G, B)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+YELLOW = (255, 255, 0)
+GREEN = (0, 255, 0)

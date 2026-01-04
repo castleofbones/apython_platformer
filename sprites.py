@@ -1,10 +1,5 @@
 import pygame
-
-# Player constants
-PLAYER_ACC = 0.5
-PLAYER_FRICTION = -0.12
-PLAYER_GRAVITY = 0.8
-PLAYER_JUMP = 20
+from settings import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, game):
@@ -12,51 +7,67 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         # Ensure we have a surface; fill it with a distinct color (e.g., Yellow)
         self.image = pygame.Surface((30, 40))
-        self.image.fill((255, 255, 0))
+        self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         
         # Position and velocity
+        # 'pos' tracks exact float position for physics, 'rect' tracks integer position for drawing
         self.pos = pygame.math.Vector2(10, 385)  # Start above the ground
         self.vel = pygame.math.Vector2(0, 0)
         self.acc = pygame.math.Vector2(0, 0)
 
     def jump(self):
-        # Jump only if standing on a platform
+        """
+        Make the player jump if they are standing on a platform.
+        """
+        # Look 1 pixel down to see if there is a platform
         self.rect.y += 1
         hits = pygame.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.y -= 1
+        
+        # If we hit something below, we can jump
         if hits:
             self.vel.y = -PLAYER_JUMP
 
     def update(self):
+        """
+        Update the player's position based on inputs and physics.
+        """
+        # Apply Gravity constantly
         self.acc = pygame.math.Vector2(0, PLAYER_GRAVITY)
-        keys = pygame.key.get_pressed()
         
+        # Check keys for horizontal movement
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self.acc.x = -PLAYER_ACC
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.acc.x = PLAYER_ACC
 
-        # Apply friction
+        # Apply friction to Acc ( Friction * Velocity )
+        # This creates a max speed and slows player down when input releases
         self.acc.x += self.vel.x * PLAYER_FRICTION
         
-        # Equations of motion
+        # Physics Equations of Motion
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
         
-        # Wrap around the screen (optional, maybe remove later if we want strict bounds)
+        # Wrap around the screen (teleport to other side)
         if self.pos.x > self.game.screen_width:
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = self.game.screen_width
 
+        # Update the rectangle position (for drawing collisions)
         self.rect.midbottom = self.pos
 
 class Platform(pygame.sprite.Sprite):
+    """
+    Represents static level geometry that the player can stand on.
+    """
     def __init__(self, x, y, w, h):
         super().__init__()
         self.image = pygame.Surface((w, h))
-        self.image.fill((0, 255, 0))
+        self.image.fill(GREEN) # Green for platforms
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

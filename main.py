@@ -1,16 +1,7 @@
 import pygame
 import sys
+from settings import *
 from sprites import *
-
-# Screen dimensions
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Platformer"
-FPS = 60
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
 
 class Game:
     def __init__(self):
