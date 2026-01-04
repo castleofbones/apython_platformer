@@ -20,9 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Project structure (venv, requirements.txt).
     - Git repository initialization.
     - GitHub Actions (planned/setup).
-- **UI**: Added Start Screen and Game Over Screen.
+- **UI**: Added Start Screen and Game Over Screen with 3-second delay protection.
+- **Assets**: Added game logo with fade-in animation.
 
 ### Changed
+- **Controls**: Pressing 'Q' during gameplay triggers Game Over; pressing 'Q' on splash screens quits the application.
 - **Refactor**: Moved game constants and configuration to `settings.py`.
+- **Refactor**: Extracted `wait_for_duration` helper for consistent UI delays.
 - **Dependencies**: Updated `pygame` to version 2.6.1 for Python 3.13 compatibility.
-- **sw**: Added docstrings and comments to `main.py` and `sprites.py`.
+- **Docs**: Added docstrings and comments to `main.py` and `sprites.py`.
