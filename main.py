@@ -52,6 +52,11 @@ class Game:
             if hits:
                 self.player.pos.y = hits[0].rect.top
                 self.player.vel.y = 0
+                
+                # If platform is moving, move player with it
+                if getattr(hits[0], 'moving', False):
+                    self.player.pos.x += hits[0].velocity
+                
                 self.player.rect.midbottom = self.player.pos
 
     def events(self):

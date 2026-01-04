@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Assets**: Added game logo with fade-in animation.
 - **Assets**: Updated font to 'Cascadia Code'.
 - **Mechanics**: Added moving platforms with configurable speed boundaries.
+- **Mechanics**: Implemented sticky platforms (player moves with platform).
 
 ### Changed
 - **Controls**: Pressing 'Q' during gameplay triggers Game Over; pressing 'Q' on splash screens quits the application.
