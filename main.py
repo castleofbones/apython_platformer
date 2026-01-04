@@ -108,7 +108,11 @@ class Game:
                     waiting = False
                     self.running = False
                 if event.type == pygame.KEYUP:
-                    waiting = False
+                    if event.key == pygame.K_q:
+                        waiting = False
+                        self.running = False
+                    else:
+                        waiting = False
 
     def draw_text(self, text, size, color, x, y):
         """Helper to draw text on the screen."""
