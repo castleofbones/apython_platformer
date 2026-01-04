@@ -82,9 +82,40 @@ class Game:
     def show_start_screen(self):
         """Show the game splash/start screen."""
         self.screen.fill(BLACK)
-        self.draw_text(SCREEN_TITLE, 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
-        self.draw_text("Arrows to move, Space to jump", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        try:
+            # Load and scale logo
+            logo_img = pygame.image.load('logo.png')
+            logo_img = pygame.transform.scale(logo_img, (400, 300))
+            logo_rect = logo_img.get_rect()
+            logo_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
+            
+            # Fade-in animation
+            for alpha in range(0, 256, 5): # Increment alpha
+                self.clock.tick(FPS)
+                self.screen.fill(BLACK)
+                logo_img.set_alpha(alpha)
+                self.screen.blit(logo_img, logo_rect)
+                pygame.display.flip()
+                
+                # Check for quit during fade
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+                        return
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                        self.running = False
+                        return 
+
+            # Keep the fully visible logo
+            self.screen.blit(logo_img, logo_rect)
+
+        except pygame.error:
+            # Fallback if image fails
+            self.draw_text(SCREEN_TITLE, 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+            
+        self.draw_text("Arrows to move, Space to jump", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 2 / 3)
         self.draw_text("Press a key to play", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+        self.draw_text("Press Q to Quit", 18, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8)
         pygame.display.flip()
         self.wait_for_key()
 
