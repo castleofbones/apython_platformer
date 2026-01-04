@@ -20,12 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Project structure (venv, requirements.txt).
     - Git repository initialization.
     - GitHub Actions (planned/setup).
-- **UI**: Added Start Screen and Game Over Screen with 3-second delay protection.
+- **UI**: Added Start Screen and Game Over Screen with 2-second delay protection.
 - **Assets**: Added game logo with fade-in animation.
+- **Assets**: Updated font to 'Cascadia Code'.
 
 ### Changed
 - **Controls**: Pressing 'Q' during gameplay triggers Game Over; pressing 'Q' on splash screens quits the application.
-- **Refactor**: Moved game constants and configuration to `settings.py`.
+- **UI**: Game Over instructions now appear after the delay to prevent accidental restarts.
+- **Refactor**: Moved game constants and configuration to `settings.py` (extracted `SCREEN_DELAY`).
 - **Refactor**: Extracted `wait_for_duration` helper for consistent UI delays.
 - **Dependencies**: Updated `pygame` to version 2.6.1 for Python 3.13 compatibility.
 - **Docs**: Added docstrings and comments to `main.py` and `sprites.py`.

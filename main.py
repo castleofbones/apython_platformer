@@ -130,11 +130,12 @@ class Game:
             return
         self.screen.fill(BLACK)
         self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        pygame.display.flip()
+
+        # Wait for delay before showing restart instructions
+        self.wait_for_duration(SCREEN_DELAY)
         self.draw_text("Press a key to play again or Q to quit", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
         pygame.display.flip()
-        
-        # Wait 3 seconds before accepting input
-        self.wait_for_duration(SCREEN_DELAY)
 
         self.wait_for_key()
 
