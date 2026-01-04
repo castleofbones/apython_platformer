@@ -141,18 +141,11 @@ class Game:
     def wait_for_duration(self, duration):
         """
         Wait for a specified duration in milliseconds.
-        Handles quit events during the wait.
         """
         start_wait = pygame.time.get_ticks()
         while pygame.time.get_ticks() - start_wait < duration:
             self.clock.tick(FPS)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                    return
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                    self.running = False
-                    return
+            pygame.event.clear()
 
     def wait_for_key(self):
         """Wait for the user to press any key."""
