@@ -68,7 +68,7 @@ class Game:
                 if event.key == pygame.K_q:
                      if self.playing:
                         self.playing = False
-                     self.running = False
+                     # Do not set running to False here, so we go to Game Over screen
 
     def draw(self):
         """
