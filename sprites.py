@@ -64,13 +64,17 @@ class Platform(pygame.sprite.Sprite):
     """
     Represents static level geometry that the player can stand on.
     """
-    def __init__(self, x, y, w, h, moving=False):
+    def __init__(self, x, y, w, h, moving=False, is_floor=False):
         super().__init__()
         self.image = pygame.Surface((w, h))
-        self.image.fill(GREEN) # Green for platforms
+        if is_floor:
+            self.image.fill(RED)
+        else:
+            self.image.fill(GREEN)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.is_floor = is_floor
         
         self.moving = moving
         if self.moving:

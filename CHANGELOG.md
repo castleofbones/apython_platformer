@@ -25,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Assets**: Updated font to 'Cascadia Code'.
 - **Mechanics**: Added moving platforms with configurable speed boundaries.
 - **Mechanics**: Implemented sticky platforms (player moves with platform).
+- **Mechanics**: Added Scoring system (+10 points per safe platform landing).
+- **Mechanics**: Implemented "Floor is Lava" mechanic (Game Over on floor collision).
+- **Level Design**: Added safe starting platform and adjusted circular moving platform.
+- **Visuals**: Changed floor color to Red to indicate danger.
+- **Testing**: Added comprehensive unit test suite (`tests/`) and `update_version.py` for auto-versioning.
+- **Refactor**: Wrapped `main.py` execution for safe importing during tests.
+- **Feature**: Added High Score system with top 5 leaderboard and initials input.
 
 ### Changed
 - **Controls**: Pressing 'Q' during gameplay triggers Game Over; pressing 'Q' on splash screens quits the application.

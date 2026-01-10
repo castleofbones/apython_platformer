@@ -2,6 +2,7 @@ import pygame
 import sys
 from settings import *
 from sprites import *
+from highscore_manager import HighScoreManager
 
 class Game:
     def __init__(self):
@@ -13,9 +14,11 @@ class Game:
         self.running = True
         self.screen_width = SCREEN_WIDTH
         self.screen_height = SCREEN_HEIGHT
+        self.hs_manager = HighScoreManager()
 
     def new(self):
         # Start a new game
+        self.score = 0
         self.all_sprites = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
         
@@ -23,13 +26,20 @@ class Game:
         self.all_sprites.add(self.player)
 
         # Create some platforms
-        p1 = Platform(0, SCREEN_HEIGHT - 40, SCREEN_WIDTH, 40) # Floor
+        p1 = Platform(0, SCREEN_HEIGHT - 40, SCREEN_WIDTH, 40, is_floor=True) # Floor
+        
+        # Starting platform near left, just above lava
+        p_start = Platform(50, SCREEN_HEIGHT - 120, 150, 20)
+        
         p2 = Platform(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT * 3 / 4, 100, 20)
         p3 = Platform(125, SCREEN_HEIGHT - 350, 100, 20, moving=True)
         p4 = Platform(350, 200, 100, 20)
         
-        self.platforms.add(p1, p2, p3, p4)
-        self.all_sprites.add(p1, p2, p3, p4)
+        self.platforms.add(p1, p_start, p2, p3, p4)
+        self.all_sprites.add(p1, p_start, p2, p3, p4)
+        
+        # Set player position to start on the safe platform
+        self.player.pos = pygame.math.Vector2(p_start.rect.centerx, p_start.rect.top - 40)
         
         self.run()
 
@@ -50,7 +60,19 @@ class Game:
         if self.player.vel.y > 0:
             hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
             if hits:
+                # Check for floor (Game Over)
+                if getattr(hits[0], 'is_floor', False):
+                    self.playing = False
+                    return
+
                 self.player.pos.y = hits[0].rect.top
+                
+                # Only score if we were actually falling (more than just gravity adjustment)
+                # Gravity adds 0.8 per frame, so standing still creates 0.8 velocity.
+                # Falling from a jump or drop will have higher velocity.
+                if self.player.vel.y > PLAYER_GRAVITY:
+                    self.score += SCORE_PER_PLATFORM
+
                 self.player.vel.y = 0
                 
                 # If platform is moving, move player with it
@@ -81,6 +103,7 @@ class Game:
         """
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
+        self.draw_text(str(self.score), 22, WHITE, SCREEN_WIDTH / 2, 15)
         # *after* drawing everything, flip the display to show the new frame
         pygame.display.flip()
 
@@ -131,19 +154,65 @@ class Game:
         self.wait_for_key()
 
     def show_go_screen(self):
-        """Show the game over/continue screen."""
+        """
+        Show the game over screen.
+        Checks for high scores, handles name input if applicable,
+        and displays the high score leaderboard.
+        """
         if not self.running:
             return
+            
+        # Check for high score
+        if self.hs_manager.is_high_score(self.score):
+            self.get_high_score_name()
+            
         self.screen.fill(BLACK)
-        self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
-        pygame.display.flip()
+        self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 6)
+        self.draw_text("Score: " + str(self.score), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        
+        # Show High Scores
+        self.draw_text("HIGH SCORES", 28, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 40)
+        y_pos = SCREEN_HEIGHT / 2
+        for i, entry in enumerate(self.hs_manager.scores):
+            text = f"{entry['name']}   {entry['score']}"
+            self.draw_text(text, 22, WHITE, SCREEN_WIDTH / 2, y_pos)
+            y_pos += 30
 
         # Wait for delay before showing restart instructions
         self.wait_for_duration(SCREEN_DELAY)
-        self.draw_text("Press a key to play again or Q to quit", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+        self.draw_text("Press a key to play again or Q to quit", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8)
         pygame.display.flip()
 
         self.wait_for_key()
+
+    def get_high_score_name(self):
+        """
+        Input loop for getting the user's initials (3 characters).
+        Updates the high score manager with the new entry.
+        """
+        name = ""
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            self.screen.fill(BLACK)
+            self.draw_text("NEW HIGH SCORE!", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+            self.draw_text("Enter Initials: " + name, 36, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+            pygame.display.flip()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    waiting = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        if len(name) > 0: # Force at least 1 char? Optional.
+                            self.hs_manager.add_score(name, self.score)
+                            waiting = False
+                    elif event.key == pygame.K_BACKSPACE:
+                        name = name[:-1]
+                    else:
+                        if len(name) < 3 and event.unicode.isalnum():
+                            name += event.unicode.upper()
 
     def wait_for_duration(self, duration):
         """
@@ -179,11 +248,12 @@ class Game:
         setattr(text_rect, align, (x, y))
         self.screen.blit(text_surface, text_rect)
 
-g = Game()
-g.show_start_screen()
-while g.running:
-    g.new()
-    g.show_go_screen()
+if __name__ == "__main__":
+    g = Game()
+    g.show_start_screen()
+    while g.running:
+        g.new()
+        g.show_go_screen()
 
-pygame.quit()
-sys.exit()
+    pygame.quit()
+    sys.exit()
