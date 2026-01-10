@@ -5,7 +5,7 @@ SCREEN_HEIGHT = 600
 FPS = 60
 FONT_NAME = 'Cascadia Code'
 SCREEN_DELAY = 2000
-VERSION = "0.1.0-5-g69c686b-dirty"
+VERSION = "0.4.0"
 PLATFORM_MOVE_DURATION = 1000
 
 # Player Properties

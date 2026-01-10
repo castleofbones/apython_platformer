@@ -1,13 +1,15 @@
 import pygame
+import os
 from settings import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, color=YELLOW):
         super().__init__()
         self.game = game
-        # Ensure we have a surface; fill it with a distinct color (e.g., Yellow)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill(color)
+        self.player_color = color
+        self.load_images()
+        
+        self.image = self.standing_frame
         self.rect = self.image.get_rect()
         
         # Position and velocity
@@ -15,6 +17,35 @@ class Player(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(10, 385)  # Start above the ground
         self.vel = pygame.math.Vector2(0, 0)
         self.acc = pygame.math.Vector2(0, 0)
+        
+        self.walking = False
+        self.jumping = False
+        self.current_frame = 0
+        self.last_update = 0
+
+    def load_images(self):
+        self.standing_frame = self.get_image('p1_idle.png')
+        self.walk_frames_r = [self.get_image('p1_walk1.png'), self.get_image('p1_walk2.png')]
+        self.walk_frames_l = [pygame.transform.flip(frame, True, False) for frame in self.walk_frames_r]
+        self.jump_frame = self.get_image('p1_jump.png')
+        
+    def get_image(self, filename):
+        img_path = os.path.join('images', filename)
+        try:
+            image = pygame.image.load(img_path).convert_alpha()
+        except pygame.error:
+             # Fallback if image missing - create colored block
+            image = pygame.Surface((30, 40))
+            image.fill(WHITE)
+
+        # Tint the image with the player's color
+        # We can use BLEND_MULT or BLEND_RGBA_MULT if using alpha
+        # Simple approach: Create a surface of same size, fill with color, blend
+        tint_surf = pygame.Surface(image.get_size()).convert_alpha()
+        tint_surf.fill(self.player_color)
+        image.blit(tint_surf, (0, 0), special_flags=pygame.BLEND_MULT)
+        
+        return image
 
     def jump(self):
         """
@@ -33,6 +64,8 @@ class Player(pygame.sprite.Sprite):
         """
         Update the player's position based on inputs and physics.
         """
+        self.animate()
+        
         # Apply Gravity constantly
         self.acc = pygame.math.Vector2(0, PLAYER_GRAVITY)
         
@@ -59,6 +92,43 @@ class Player(pygame.sprite.Sprite):
 
         # Update the rectangle position (for drawing collisions)
         self.rect.midbottom = self.pos
+
+    def animate(self):
+        now = pygame.time.get_ticks()
+        
+        # Check if we are walking
+        if self.vel.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+            
+        # Check if jumping (in air)
+        # Simple check: if vertical velocity is significant
+        if abs(self.vel.y) > 0.5: # small threshold
+            self.jumping = True
+        else:
+            self.jumping = False
+
+        # Show Jump Frame
+        if self.jumping:
+            self.image = self.jump_frame
+            # Flip based on direction
+            if self.vel.x < 0:
+                self.image = pygame.transform.flip(self.jump_frame, True, False)
+        
+        # Show Walk Animation
+        elif self.walking:
+            if now - self.last_update > 200: # 200ms per frame
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
+                if self.vel.x > 0:
+                    self.image = self.walk_frames_r[self.current_frame]
+                else:
+                    self.image = self.walk_frames_l[self.current_frame]
+                    
+        # Show Idle Frame
+        if not self.jumping and not self.walking:
+            self.image = self.standing_frame
 
 class Platform(pygame.sprite.Sprite):
     """

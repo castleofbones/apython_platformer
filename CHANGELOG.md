@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.1] - 2026-01-10
+## [0.4.0] - 2026-01-10
+### Added
+- **Visuals**: Implemented animated player sprites (Idle, Walk, Jump).
+- **Visuals**: Added pixel art character assets.
+- **Visuals**: Implemented dynamic sprite tinting to support Red/Blue/Yellow player colors.
+
 ### Fixed
 - **UI**: Fixed version number alignment on start screen to prevent cutoff on right side.
 - **Scoring**: Fixed bug where initial score started at 10 instead of 0.
