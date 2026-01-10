@@ -124,11 +124,21 @@ class Game:
         self.screen.fill(BLACK)
         try:
             # Load and scale logo
+            # Load and scale logo
             logo_img = pygame.image.load('logo.png')
-            # detailed logo might need scaling, let's keep it reasonable width
-            logo_img = pygame.transform.scale(logo_img, (400, 300))
+            
+            # User scaling request: fit to screen keeping aspect ratio
+            # Determine scale factor
+            l_rect = logo_img.get_rect()
+            scale_w = SCREEN_WIDTH / l_rect.width
+            scale_h = SCREEN_HEIGHT / l_rect.height
+            scale = min(scale_w, scale_h)
+            
+            new_size = (int(l_rect.width * scale), int(l_rect.height * scale))
+            logo_img = pygame.transform.scale(logo_img, new_size)
+            
             logo_rect = logo_img.get_rect()
-            logo_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
+            logo_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
             
             # Fade-in animation
             for alpha in range(0, 256, 5): # Increment alpha
@@ -163,6 +173,7 @@ class Game:
         # But we need to wait here for a key press
         self.screen.fill(BLACK)
         self.draw_text(SCREEN_TITLE, 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        self.draw_text("Arrows to move, Space to jump", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 2 / 5)
         
         # Determine color name string
         c_name = "Yellow"
@@ -256,6 +267,7 @@ class Game:
             self.screen.fill(BLACK)
             self.draw_text("NEW HIGH SCORE!", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
             self.draw_text("Enter Initials: " + name, 36, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+            self.draw_text("Press Enter to Submit", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50)
             pygame.display.flip()
             
             for event in pygame.event.get():

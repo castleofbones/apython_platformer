@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- **Scoring**: Fixed bug where initial score started at 10 instead of 0.
+- **UI**: Added "Press Enter to Submit" instruction to High Score name entry screen.
+
+## [0.3.0] - 2026-01-10
 
 ### Added
 - **Game Engine**: Basic `Game` class loop with `update`, `draw`, and `events` methods.
