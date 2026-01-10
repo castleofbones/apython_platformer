@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-01-10
+### Fixed
+- **UI**: Fixed version number alignment on start screen to prevent cutoff on right side.
+- **Scoring**: Fixed bug where initial score started at 10 instead of 0.
+- **Scoring**: Players only score when landing on a *different* platform (no farming same platform).
+- **UI**: Added "Press Enter to Submit" instruction to High Score name entry screen.
+- **UI**: Restored "Arrows to move, Space to jump" instructions to Start Screen.
+- **UI**: Scaled Start Screen logo to fit screen while maintaining aspect ratio.
+- **Input**: Restricted High Score initials input to A-Z (alpha) characters only.
+
+## [0.3.0] - 2026-01-10
+
 ### Added
 - **Game Engine**: Basic `Game` class loop with `update`, `draw`, and `events` methods.
 - **Player**: `Player` class with physics (gravity, acceleration, friction).

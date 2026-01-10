@@ -16,6 +16,7 @@ class Game:
         self.screen_height = SCREEN_HEIGHT
         self.hs_manager = HighScoreManager()
         self.player_color = YELLOW
+        self.last_platform = None
 
     def new(self):
         # Start a new game
@@ -42,6 +43,7 @@ class Game:
         # Set player position to start on the safe platform
         # Place directly on top to prevent "falling" logic from triggering score on spawn
         self.player.pos = pygame.math.Vector2(p_start.rect.centerx, p_start.rect.top)
+        self.last_platform = p_start
         
         self.run()
 
@@ -70,10 +72,11 @@ class Game:
                 self.player.pos.y = hits[0].rect.top
                 
                 # Only score if we were actually falling (more than just gravity adjustment)
-                # Gravity adds 0.8 per frame, so standing still creates 0.8 velocity.
-                # Falling from a jump or drop will have higher velocity.
+                # AND if we land on a different platform
                 if self.player.vel.y > PLAYER_GRAVITY:
-                    self.score += SCORE_PER_PLATFORM
+                    if hits[0] != self.last_platform:
+                        self.score += SCORE_PER_PLATFORM
+                        self.last_platform = hits[0]
 
                 self.player.vel.y = 0
                 
@@ -124,11 +127,21 @@ class Game:
         self.screen.fill(BLACK)
         try:
             # Load and scale logo
+            # Load and scale logo
             logo_img = pygame.image.load('logo.png')
-            # detailed logo might need scaling, let's keep it reasonable width
-            logo_img = pygame.transform.scale(logo_img, (400, 300))
+            
+            # User scaling request: fit to screen keeping aspect ratio
+            # Determine scale factor
+            l_rect = logo_img.get_rect()
+            scale_w = SCREEN_WIDTH / l_rect.width
+            scale_h = SCREEN_HEIGHT / l_rect.height
+            scale = min(scale_w, scale_h)
+            
+            new_size = (int(l_rect.width * scale), int(l_rect.height * scale))
+            logo_img = pygame.transform.scale(logo_img, new_size)
+            
             logo_rect = logo_img.get_rect()
-            logo_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
+            logo_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
             
             # Fade-in animation
             for alpha in range(0, 256, 5): # Increment alpha
@@ -163,6 +176,7 @@ class Game:
         # But we need to wait here for a key press
         self.screen.fill(BLACK)
         self.draw_text(SCREEN_TITLE, 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        self.draw_text("Arrows to move, Space to jump", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 2 / 5)
         
         # Determine color name string
         c_name = "Yellow"
@@ -174,7 +188,7 @@ class Game:
         self.draw_text("Press ENTER to play", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
         
         # Draw version
-        self.draw_text(f"v{VERSION}", 16, WHITE, SCREEN_WIDTH - 80, SCREEN_HEIGHT - 20)
+        self.draw_text(f"v{VERSION}", 16, WHITE, 10, SCREEN_HEIGHT - 10, align="bottomleft")
         
         pygame.display.flip()
         
@@ -256,6 +270,7 @@ class Game:
             self.screen.fill(BLACK)
             self.draw_text("NEW HIGH SCORE!", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
             self.draw_text("Enter Initials: " + name, 36, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+            self.draw_text("Press Enter to Submit", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50)
             pygame.display.flip()
             
             for event in pygame.event.get():
@@ -270,7 +285,7 @@ class Game:
                     elif event.key == pygame.K_BACKSPACE:
                         name = name[:-1]
                     else:
-                        if len(name) < 3 and event.unicode.isalnum():
+                        if len(name) < 3 and event.unicode.isalpha():
                             name += event.unicode.upper()
 
     def wait_for_duration(self, duration):

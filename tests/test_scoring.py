@@ -92,3 +92,48 @@ def test_initial_drop_no_score(game):
             break
             
     assert game.score == 0
+
+def test_score_unique_platform(game):
+    """
+    User Requirement: A user's score should only increment if they land on a platform 
+    different than the one they have jumped off.
+    """
+    game.new()
+    initial_score = game.score
+    
+    # Identify start platform
+    start_platform = game.last_platform
+    
+    # Simulate a jump and land on the SAME platform
+    # We can fake the player state
+    game.player.vel.y = 10 # Falling
+    game.player.pos.y = start_platform.rect.top - 10 # Above
+    
+    # Run update to trigger collision
+    game.update()
+    
+    # Should collide, but NOT score because it's the same platform
+    assert game.player.vel.y == 0 # Landed
+    assert game.score == initial_score
+    
+    # Now simulate moving to a NEW platform
+    # Find a different platform (Game.new creates multiple)
+    new_platform = None
+    for p in game.platforms:
+        if p != start_platform and not getattr(p, 'is_floor', False) and not getattr(p, 'moving', False):
+            new_platform = p
+            break
+            
+    if not new_platform:
+        # Create one if needed
+        new_platform = Platform(100, 100, 100, 20)
+        game.platforms.add(new_platform)
+
+    game.player.pos.x = new_platform.rect.centerx
+    game.player.pos.y = new_platform.rect.top - 10
+    game.player.vel.y = 10
+    
+    game.update()
+    
+    assert game.score == initial_score + 10 # Should score now
+    assert game.last_platform == new_platform
