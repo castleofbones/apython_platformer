@@ -16,6 +16,7 @@ class Game:
         self.screen_height = SCREEN_HEIGHT
         self.hs_manager = HighScoreManager()
         self.player_color = YELLOW
+        self.last_platform = None
 
     def new(self):
         # Start a new game
@@ -42,6 +43,7 @@ class Game:
         # Set player position to start on the safe platform
         # Place directly on top to prevent "falling" logic from triggering score on spawn
         self.player.pos = pygame.math.Vector2(p_start.rect.centerx, p_start.rect.top)
+        self.last_platform = p_start
         
         self.run()
 
@@ -70,10 +72,11 @@ class Game:
                 self.player.pos.y = hits[0].rect.top
                 
                 # Only score if we were actually falling (more than just gravity adjustment)
-                # Gravity adds 0.8 per frame, so standing still creates 0.8 velocity.
-                # Falling from a jump or drop will have higher velocity.
+                # AND if we land on a different platform
                 if self.player.vel.y > PLAYER_GRAVITY:
-                    self.score += SCORE_PER_PLATFORM
+                    if hits[0] != self.last_platform:
+                        self.score += SCORE_PER_PLATFORM
+                        self.last_platform = hits[0]
 
                 self.player.vel.y = 0
                 
