@@ -36,9 +36,9 @@ class HighScoreManager:
         # Check against the lowest score
         return score > self.scores[-1]['score']
 
-    def add_score(self, name, score):
+    def add_score(self, name, score, color=(255, 255, 255)):
         # Add new score
-        self.scores.append({'name': name, 'score': score})
+        self.scores.append({'name': name, 'score': score, 'color': color})
         # Sort descending by score
         self.scores.sort(key=lambda x: x['score'], reverse=True)
         # Keep top 5

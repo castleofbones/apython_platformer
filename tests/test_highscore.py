@@ -29,6 +29,17 @@ def test_add_score(manager):
     assert len(mgr2.scores) == 1
     assert mgr2.scores[0]['score'] == 100
 
+def test_add_score_with_color(manager):
+    color = (255, 0, 0)
+    manager.add_score("RED", 200, color)
+    assert manager.scores[0]['color'] == list(color) or manager.scores[0]['color'] == tuple(color)
+    
+    # Persistence
+    mgr2 = HighScoreManager(TEST_FILE)
+    loaded_color = mgr2.scores[0]['color']
+    # JSON loads tuples as lists
+    assert tuple(loaded_color) == color
+
 def test_is_high_score(manager):
     manager.add_score("A", 100)
     assert manager.is_high_score(50) is True # Still have room

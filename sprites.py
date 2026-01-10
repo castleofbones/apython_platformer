@@ -2,12 +2,12 @@ import pygame
 from settings import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, game):
+    def __init__(self, game, color=YELLOW):
         super().__init__()
         self.game = game
         # Ensure we have a surface; fill it with a distinct color (e.g., Yellow)
         self.image = pygame.Surface((30, 40))
-        self.image.fill(YELLOW)
+        self.image.fill(color)
         self.rect = self.image.get_rect()
         
         # Position and velocity

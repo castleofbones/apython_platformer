@@ -15,6 +15,7 @@ class Game:
         self.screen_width = SCREEN_WIDTH
         self.screen_height = SCREEN_HEIGHT
         self.hs_manager = HighScoreManager()
+        self.player_color = YELLOW
 
     def new(self):
         # Start a new game
@@ -22,7 +23,7 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.platforms = pygame.sprite.Group()
         
-        self.player = Player(self)
+        self.player = Player(self, self.player_color)
         self.all_sprites.add(self.player)
 
         # Create some platforms
@@ -39,7 +40,8 @@ class Game:
         self.all_sprites.add(p1, p_start, p2, p3, p4)
         
         # Set player position to start on the safe platform
-        self.player.pos = pygame.math.Vector2(p_start.rect.centerx, p_start.rect.top - 40)
+        # Place directly on top to prevent "falling" logic from triggering score on spawn
+        self.player.pos = pygame.math.Vector2(p_start.rect.centerx, p_start.rect.top)
         
         self.run()
 
@@ -103,7 +105,17 @@ class Game:
         """
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
-        self.draw_text(str(self.score), 22, WHITE, SCREEN_WIDTH / 2, 15)
+        
+        # Draw current score in player's color
+        self.draw_text(str(self.score), 22, self.player_color, SCREEN_WIDTH / 2, 15)
+        
+        # Draw all-time high score in player's color
+        if self.hs_manager.scores:
+            top_score = self.hs_manager.scores[0]
+            hs_color = top_score.get('color', YELLOW)
+            if isinstance(hs_color, list): hs_color = tuple(hs_color)
+            self.draw_text(f"HS: {top_score['score']}", 22, hs_color, SCREEN_WIDTH - 10, 15, align="topright")
+        
         # *after* drawing everything, flip the display to show the new frame
         pygame.display.flip()
 
@@ -133,25 +145,67 @@ class Game:
                         return
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                         self.running = False
-                        return 
-
-            # Keep the fully visible logo
+                        return
+                        
+            # Keep the fully visible logo for a moment
             self.screen.blit(logo_img, logo_rect)
             pygame.display.flip()
-            
-            # Wait for 3 seconds
             self.wait_for_duration(SCREEN_DELAY)
 
         except pygame.error:
-            # Fallback if image fails
-            self.draw_text(SCREEN_TITLE, 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
-            
-        self.draw_text("Arrows to move, Space to jump", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 2 / 3)
-        self.draw_text("Press a key to play", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
-        self.draw_text("Press Q to Quit", 18, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 7 / 8)
-        self.draw_text(VERSION, 12, WHITE, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, align="bottomright")
+            pass # Fallback if image fails
+
+        self.show_color_selection_screen()
+
+    def show_color_selection_screen(self):
+        """Show value selection screen."""
+        # Check if user wants to play again (loop handled by main block)
+        # But we need to wait here for a key press
+        self.screen.fill(BLACK)
+        self.draw_text(SCREEN_TITLE, 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        
+        # Determine color name string
+        c_name = "Yellow"
+        if self.player_color == RED: c_name = "Red"
+        elif self.player_color == BLUE: c_name = "Blue"
+        
+        self.draw_text(f"Current Player Color: {c_name}", 22, self.player_color, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.draw_text("Press (R)ed, (B)lue, (Y)ellow to select", 18, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 30)
+        self.draw_text("Press ENTER to play", 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT * 3 / 4)
+        
+        # Draw version
+        self.draw_text(f"v{VERSION}", 16, WHITE, SCREEN_WIDTH - 80, SCREEN_HEIGHT - 20)
+        
         pygame.display.flip()
-        self.wait_for_key()
+        
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting = False
+                    self.running = False
+                if event.type == pygame.KEYUP:
+                    # 'Q' to quit
+                    if event.key == pygame.K_q:
+                        waiting = False
+                        self.running = False
+                    # Color selection
+                    elif event.key == pygame.K_r:
+                        self.player_color = RED
+                        self.show_color_selection_screen() # Refresh
+                        return # Break this call, let the refreshed call handle loop
+                    elif event.key == pygame.K_b:
+                        self.player_color = BLUE
+                        self.show_color_selection_screen()
+                        return
+                    elif event.key == pygame.K_y:
+                        self.player_color = YELLOW
+                        self.show_color_selection_screen()
+                        return
+                    # Start
+                    elif event.key == pygame.K_RETURN:
+                        waiting = False
 
     def show_go_screen(self):
         """
@@ -168,14 +222,19 @@ class Game:
             
         self.screen.fill(BLACK)
         self.draw_text("GAME OVER", 48, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 6)
-        self.draw_text("Score: " + str(self.score), 22, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+        self.draw_text("Score: " + str(self.score), 22, self.player_color, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
         
         # Show High Scores
         self.draw_text("HIGH SCORES", 28, WHITE, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 40)
         y_pos = SCREEN_HEIGHT / 2
         for i, entry in enumerate(self.hs_manager.scores):
+            entry_color = entry.get('color', YELLOW)
+            # Ensure color is a tuple/list, sometimes json loads as list
+            if isinstance(entry_color, list):
+                entry_color = tuple(entry_color)
+                
             text = f"{entry['name']}   {entry['score']}"
-            self.draw_text(text, 22, WHITE, SCREEN_WIDTH / 2, y_pos)
+            self.draw_text(text, 22, entry_color, SCREEN_WIDTH / 2, y_pos)
             y_pos += 30
 
         # Wait for delay before showing restart instructions
@@ -206,7 +265,7 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         if len(name) > 0: # Force at least 1 char? Optional.
-                            self.hs_manager.add_score(name, self.score)
+                            self.hs_manager.add_score(name, self.score, self.player_color)
                             waiting = False
                     elif event.key == pygame.K_BACKSPACE:
                         name = name[:-1]
