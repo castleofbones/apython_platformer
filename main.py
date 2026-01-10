@@ -282,7 +282,7 @@ class Game:
                     elif event.key == pygame.K_BACKSPACE:
                         name = name[:-1]
                     else:
-                        if len(name) < 3 and event.unicode.isalnum():
+                        if len(name) < 3 and event.unicode.isalpha():
                             name += event.unicode.upper()
 
     def wait_for_duration(self, duration):
